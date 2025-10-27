@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The POSHO DANCE DELUXE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientMove 10s ease infinite;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .game-container {
+            width: 90vw;
+            max-width: 1200px;
+            height: 90vh;
+            background: rgba(0,0,0,0.8);
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 36px;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+            animation: titleBounce 2s ease infinite;
+        }
+
+        @keyframes titleBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat {
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 15px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .game-area {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .lane {
+            position: absolute;
+            top: 0;
+            width: 18%;
+            height: 100%;
+            border-left: 2px solid rgba(255,255,255,0.2);
+            border-right: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .lane:nth-child(1) { left: 10%; background: rgba(255,0,0,0.1); }
+        .lane:nth-child(2) { left: 28%; background: rgba(0,255,0,0.1); }
+        .lane:nth-child(3) { left: 46%; background: rgba(0,0,255,0.1); }
+        .lane:nth-child(4) { left: 64%; background: rgba(255,255,0,0.1); }
+
+        .target-zone {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 80px;
+            border: 4px solid white;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 30px rgba(255,255,255,0.5);
+            z-index: 10;
+        }
+
+        .perfect-zone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 25px;
+            background: rgba(255,215,0,0.3);
+            border: 2px solid gold;
+            border-radius: 10px;
+            box-shadow: 0 0 20px gold;
+        }
+
+        .note {
+            position: absolute;
+            width: 16%;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            animation: fall linear;
+        }
+
+        @keyframes fall {
+            from { top: -100px; }
+            to { top: calc(100% + 100px); }
+        }
+
+        .note.lane-0 { left: 11%; background: linear-gradient(135deg, #ff6b6b, #ff0000); }
+        .note.lane-1 { left: 29%; background: linear-gradient(135deg, #51cf66, #00ff00); }
+        .note.lane-2 { left: 47%; background: linear-gradient(135deg, #4dabf7, #0000ff); }
+        .note.lane-3 { left: 65%; background: linear-gradient(135deg, #ffd43b, #ffff00); }
+
+        .note.hit {
+            animation: hitEffect 0.3s ease-out forwards;
+        }
+
+        @keyframes hitEffect {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .game-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 5px solid white;
+            font-size: 50px;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            position: relative;
+        }
+
+        .game-button:nth-child(1) { background: linear-gradient(135deg, #ff6b6b, #ff0000); }
+        .game-button:nth-child(2) { background: linear-gradient(135deg, #51cf66, #00ff00); }
+        .game-button:nth-child(3) { background: linear-gradient(135deg, #4dabf7, #0000ff); }
+        .game-button:nth-child(4) { background: linear-gradient(135deg, #ffd43b, #ffff00); }
+
+        .game-button:active, .game-button.pressed {
+            transform: scale(0.9);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .key-hint {
+            position: absolute;
+            top: -25px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .feedback {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 20px currentColor;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 50;
+        }
+
+        .feedback.show {
+            animation: feedbackShow 0.6s ease-out;
+        }
+
+        @keyframes feedbackShow {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .combo-display {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            color: gold;
+            font-weight: bold;
+            text-shadow: 0 0 20px orange;
+            z-index: 30;
+        }
+
+        .posho-dancer {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 120px;
+            animation: poshoIdle 2s ease-in-out infinite;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
+            z-index: 5;
+        }
+
+        .posho-dancer.dancing {
+            animation: poshoDance 0.3s ease-in-out;
+        }
+
+        @keyframes poshoIdle {
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(-5deg); }
+            50% { transform: translateX(-50%) translateY(-20px) rotate(5deg); }
+        }
+
+        @keyframes poshoDance {
+            0%, 100% { transform: translateX(-50%) scale(1) rotate(0deg); }
+            50% { transform: translateX(-50%) scale(1.3) rotate(15deg); }
+        }
+
+        .game-over, .start-screen, .name-input-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            z-index: 100;
+            display: none;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .start-screen { display: block; }
+
+        .game-over.show, .start-screen.show, .name-input-screen.show {
+            display: block;
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+
+        .game-over h2, .start-screen h1, .name-input-screen h2 {
+            font-size: 50px;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+        }
+
+        .game-over p, .start-screen p {
+            font-size: 20px;
+            color: white;
+            margin: 10px 0;
+        }
+
+        .button {
+            margin: 10px;
+            padding: 15px 40px;
+            font-size: 22px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+
+        .button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+
+        .miss-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 30;
+        }
+
+        .miss-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            border: 2px solid white;
+            transition: all 0.3s;
+        }
+
+        .miss-dot.missed {
+            background: #ff0000;
+            box-shadow: 0 0 15px #ff0000;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            font-size: 25px;
+            animation: explode 1s ease-out forwards;
+            z-index: 60;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+        }
+
+        .leaderboard {
+            background: rgba(0,0,0,0.6);
+            padding: 20px;
+            border-radius: 20px;
+            margin-top: 20px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .leaderboard h3 {
+            color: gold;
+            font-size: 32px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px orange;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-entry:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+
+        .leaderboard-entry.rank-1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-color: gold;
+            box-shadow: 0 0 20px gold;
+        }
+
+        .leaderboard-entry.rank-2 {
+            background: linear-gradient(135deg, #C0C0C0, #808080);
+            border-color: silver;
+        }
+
+        .leaderboard-entry.rank-3 {
+            background: linear-gradient(135deg, #CD7F32, #8B4513);
+            border-color: #CD7F32;
+        }
+
+        .rank {
+            font-weight: bold;
+            font-size: 24px;
+            min-width: 40px;
+        }
+
+        .player-name {
+            flex: 1;
+            text-align: left;
+            margin-left: 15px;
+            font-weight: bold;
+        }
+
+        .player-score {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 24px;
+            border-radius: 15px;
+            border: 3px solid white;
+            margin: 20px 0;
+            text-align: center;
+            font-family: 'Comic Sans MS', cursive;
+            font-weight: bold;
+        }
+
+        .loading {
+            color: white;
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        .view-leaderboard-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: none;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .view-leaderboard-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(255,215,0,0.6);
+        }
+    </style>
+</head>
+<body>
+    <button class="view-leaderboard-btn" onclick="showLeaderboardOnly()">🏆 VER RANKING</button>
+
+    <audio id="bgMusic" loop>
+        <source src="music.mp3">
+    </audio>
+
+    <div class="game-container">
+        <div class="start-screen" id="startScreen">
+            <h1>🐔 POSHO DANCE DELUXE 🎵</h1>
+            <p style="font-size: 18px;">¡Presiona los botones cuando las bolas lleguen a la zona!</p>
+            <p>🎯 <strong>DORADA</strong> = PERFECT (+100 pts)</p>
+            <p>⭐ <strong>BLANCA</strong> = GOOD (+50 pts)</p>
+            <p>❌ <strong>10 Fallos</strong> = GAME OVER</p>
+            <p><strong>Teclas: A (🔴) S (🟢) D (🔵) F (🟡)</strong></p>
+            <p style="color: #ffff00; font-size: 16px;">🎵 ¡El juego incluye música! 🎵</p>
+            <button class="button" onclick="startGame('easy')" style="background: linear-gradient(135deg, #51cf66, #00ff00);">😎 FÁCIL</button>
+            <button class="button" onclick="startGame('medium')" style="background: linear-gradient(135deg, #ffd43b, #ff9800);">🔥 MEDIO</button>
+            <button class="button" onclick="startGame('hard')" style="background: linear-gradient(135deg, #ff6b6b, #ff0000);">😑 DIFÍCIL</button>
+            
+            <div class="leaderboard" id="startLeaderboard">
+                <h3>🏆 TOP 13 RANKING GLOBAL 🏆</h3>
+                <div class="loading">Cargando ranking...</div>
+            </div>
+        </div>
+
+        <div class="name-input-screen" id="nameInputScreen">
+            <h2>🎉 ¡JUEGO TERMINADO! 🎉</h2>
+            <p style="font-size: 24px; color: gold;">Tu Puntuación: <span id="recordScore">0</span></p>
+            <p style="font-size: 18px; margin-top: 20px;">Ingresa tu nombre para el ranking:</p>
+            <input type="text" id="playerNameInput" class="name-input" placeholder="TU NOMBRE" maxlength="15">
+            <button class="button" onclick="saveScore()">💾 GUARDAR Y VER RANKING</button>
+        </div>
+
+        <div class="header">
+            <div class="title">🎮 POSHO DANCE 🎵</div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">PUNTOS</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">COMBO</div>
+                    <div class="stat-value" id="comboCounter">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">FALLOS</div>
+                    <div class="stat-value" id="missCounter">0/10</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="posho-dancer" id="posho">🐔</div>
+        <div class="combo-display" id="comboDisplay"></div>
+
+        <div class="game-area" id="gameArea">
+            <div class="lane"></div>
+            <div class="lane"></div>
+            <div class="lane"></div>
+            <div class="lane"></div>
+            
+            <div class="target-zone">
+                <div class="perfect-zone"></div>
+            </div>
+
+            <div class="miss-indicator" id="missIndicator"></div>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="button-container">
+            <div class="game-button" data-lane="0" id="btn0">
+                <div class="key-hint">A</div>
+                🔴
+            </div>
+            <div class="game-button" data-lane="1" id="btn1">
+                <div class="key-hint">S</div>
+                🟢
+            </div>
+            <div class="game-button" data-lane="2" id="btn2">
+                <div class="key-hint">D</div>
+                🔵
+            </div>
+            <div class="game-button" data-lane="3" id="btn3">
+                <div class="key-hint">F</div>
+                🟡
+            </div>
+        </div>
+
+        <div class="game-over" id="gameOver">
+            <h2>🎮 GAME OVER 🎮</h2>
+            <p>🏆 Puntuación: <span id="finalScore">0</span></p>
+            <p>🔥 Mejor Combo: <span id="bestCombo">0</span></p>
+            <p>⭐ Perfectos: <span id="perfectCount">0</span></p>
+            <p>✨ Precisión: <span id="accuracy">0</span>%</p>
+            
+            <div class="leaderboard" id="gameOverLeaderboard">
+                <h3>🏆 TOP 13 RANKING GLOBAL 🏆</h3>
+                <div class="loading">Cargando ranking...</div>
+            </div>
+            
+            <button class="button" onclick="location.reload()">🔄 JUGAR DE NUEVO</button>
+        </div>
+    </div>
+
+<script type="module">
+    // 1. Importar la función para la base de datos (getDatabase)
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, push, set, onValue, query, orderByChild, limitToLast, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    // ... (Tu objeto firebaseConfig aquí)
+
+    let app, database;
+    try {
+        // Inicializar la aplicación
+        app = initializeApp(firebaseConfig);
+        // 2. Inicializar la base de datos
+        database = getDatabase(app);
+        console.log("Firebase Database inicializado y listo para guardar récords.");
+    } catch(e) {
+        console.log('Error al configurar Firebase, usando modo demo:', e);
+    }
+    
+    // ✅ EL CÓDIGO DEL JUEGO CONTINÚA DIRECTAMENTE AQUÍ:
+        let score = 0, combo = 0, bestCombo = 0, misses = 0;
+        let gameActive = false, notes = [], noteId = 0;
+        let spawnInterval, gameSpeed = 3000, spawnRate = 1000;
+        let perfectHits = 0, totalNotes = 0;
+        let currentScore = 0;
+
+        const poshoEmojis = ['🐔', '🐓', '🐥', '🐤', '🦃'];
+        const posho = document.getElementById('posho');
+        const gameArea = document.getElementById('gameArea');
+        const bgMusic = document.getElementById('bgMusic');
+        const keys = ['a', 's', 'd', 'f'];
+        const buttons = [btn0, btn1, btn2, btn3];
+
+        window.startGame = function(diff) {
+            document.getElementById('startScreen').style.display = 'none';
+            gameActive = true;
+            
+            bgMusic.play().catch(e => console.log('Error al reproducir música:', e));
+            
+            if(diff === 'easy') { gameSpeed = 4000; spawnRate = 1500; }
+            else if(diff === 'medium') { gameSpeed = 3000; spawnRate = 1000; }
+            else { gameSpeed = 2000; spawnRate = 600; }
+
+            for(let i = 0; i < 10; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'miss-dot';
+                dot.id = `miss-${i}`;
+                missIndicator.appendChild(dot);
+            }
+
+            spawnNote();
+            spawnInterval = setInterval(() => gameActive && spawnNote(), spawnRate);
+        };
+
+        function spawnNote() {
+            const lane = Math.floor(Math.random() * 4);
+            const note = document.createElement('div');
+            note.className = `note lane-${lane}`;
+            note.textContent = poshoEmojis[Math.floor(Math.random() * poshoEmojis.length)];
+            note.style.animationDuration = `${gameSpeed}ms`;
+            
+            const noteData = { id: noteId++, lane, element: note, hit: false };
+            notes.push(noteData);
+            totalNotes++;
+            gameArea.appendChild(note);
+            
+            setTimeout(() => !noteData.hit && gameActive && missNote(noteData), gameSpeed + 500);
+        }
+
+        function hitNote(lane) {
+            if(!gameActive) return;
+
+            buttons[lane].classList.add('pressed');
+            setTimeout(() => buttons[lane].classList.remove('pressed'), 150);
+
+            const targetZone = document.querySelector('.target-zone').getBoundingClientRect();
+            const perfectZone = document.querySelector('.perfect-zone').getBoundingClientRect();
+
+            let hitNote = null, bestDist = Infinity;
+
+            notes.forEach(n => {
+                if(n.lane === lane && !n.hit && n.element.parentElement) {
+                    const rect = n.element.getBoundingClientRect();
+                    const dist = Math.abs(rect.top - targetZone.top);
+                    if(dist < bestDist && dist < 150) {
+                        bestDist = dist;
+                        hitNote = n;
+                    }
+                }
+            });
+
+            if(hitNote) {
+                hitNote.hit = true;
+                const rect = hitNote.element.getBoundingClientRect();
+                
+                let points = 0, feedback = '', color = '';
+
+                if(rect.top >= perfectZone.top - 20 && rect.bottom <= perfectZone.bottom + 20) {
+                    points = 100;
+                    feedback = '💎 PERFECT!';
+                    color = 'gold';
+                    perfectHits++;
+                    createExplosion(rect.left + rect.width/2, rect.top);
+                } else if(rect.top >= targetZone.top - 30 && rect.bottom <= targetZone.bottom + 30) {
+                    points = 50;
+                    feedback = '✨ GOOD!';
+                    color = 'lightblue';
+                } else {
+                    points = 20;
+                    feedback = '👍 OK';
+                    color = 'white';
+                }
+
+                combo++;
+                bestCombo = Math.max(bestCombo, combo);
+                score += points * Math.floor(combo / 10 + 1);
+                
+                updateUI();
+                showFeedback(feedback, color);
+                animatePosho();
+                
+                hitNote.element.classList.add('hit');
+                setTimeout(() => hitNote.element.remove(), 300);
+            }
+        }
+
+        function missNote(noteData) {
+            if(noteData.hit || !gameActive) return;
+            
+            misses++;
+            combo = 0;
+            updateUI();
+            showFeedback('❌ MISS', 'red');
+            
+            const dot = document.getElementById(`miss-${misses - 1}`);
+            if(dot) dot.classList.add('missed');
+            
+            noteData.element.remove();
+            if(misses >= 10) endGame();
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('comboCounter').textContent = combo;
+            document.getElementById('missCounter').textContent = `${misses}/10`;
+            document.getElementById('comboDisplay').textContent = combo > 0 ? `${combo}x COMBO 🔥` : '';
+        }
+
+        function showFeedback(text, color) {
+            const fb = document.getElementById('feedback');
+            fb.textContent = text;
+            fb.style.color = color;
+            fb.classList.remove('show');
+            void fb.offsetWidth;
+            fb.classList.add('show');
+        }
+
+        function animatePosho() {
+            posho.classList.remove('dancing');
+            void posho.offsetWidth;
+            posho.classList.add('dancing');
+            posho.textContent = poshoEmojis[Math.floor(Math.random() * poshoEmojis.length)];
+        }
+
+        function createExplosion(x, y) {
+            for(let i = 0; i < 8; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.textContent = '⭐';
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                const angle = (Math.PI * 2 * i) / 8;
+                p.style.setProperty('--x', Math.cos(angle) * 80 + 'px');
+                p.style.setProperty('--y', Math.sin(angle) * 80 + 'px');
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            }
+        }
+
+        async function endGame() {
+            gameActive = false;
+            clearInterval(spawnInterval);
+            notes.forEach(n => n.element.remove());
+            
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+            
+            currentScore = score;
+            const acc = totalNotes > 0 ? Math.round(((totalNotes - misses) / totalNotes) * 100) : 0;
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('bestCombo').textContent = bestCombo;
+            document.getElementById('perfectCount').textContent = perfectHits;
+            document.getElementById('accuracy').textContent = acc;
+
+            // Siempre mostrar pantalla de nombre primero
+            document.getElementById('recordScore').textContent = currentScore;
+            document.getElementById('nameInputScreen').classList.add('show');
+        }
+
+        window.saveScore = async function() {
+            const playerName = document.getElementById('playerNameInput').value.trim();
+            
+            if(!playerName) {
+                alert('¡Por favor ingresa tu nombre! 😎');
+                return;
+            }
+
+            if(!database) {
+                alert('⚠️ Firebase no está configurado. El ranking no se guardará online, pero puedes ver tus estadísticas.');
+                document.getElementById('nameInputScreen').style.display = 'none';
+                document.getElementById('gameOver').classList.add('show');
+                return;
+            }
+
+            try {
+                // Primero verificar si entra al TOP 13
+                const scoresRef = ref(database, 'scores');
+                const snapshot = await new Promise((resolve) => {
+                    onValue(scoresRef, resolve, { onlyOnce: true });
+                });
+
+                const scores = [];
+                snapshot.forEach(child => {
+                    scores.push({ id: child.key, ...child.val() });
+                });
+                
+                scores.sort((a, b) => b.score - a.score);
+                
+                // Guardar solo si entra al TOP 13
+                if(scores.length < 13 || currentScore > scores[scores.length - 1].score) {
+                    const newScoreRef = push(scoresRef);
+                    await set(newScoreRef, {
+                        name: playerName,
+                        score: currentScore,
+                        timestamp: Date.now()
+                    });
+
+                    await cleanupScores();
+                }
+
+                document.getElementById('nameInputScreen').style.display = 'none';
+                loadLeaderboard('gameOverLeaderboard');
+                document.getElementById('gameOver').classList.add('show');
+            } catch(e) {
+                console.log('Error guardando:', e);
+                alert('Error al guardar el récord 😢');
+                document.getElementById('nameInputScreen').style.display = 'none';
+                document.getElementById('gameOver').classList.add('show');
+            }
+        };
+
+        async function cleanupScores() {
+            if(!database) return;
+
+            try {
+                const scoresRef = ref(database, 'scores');
+                onValue(scoresRef, async (snapshot) => {
+                    const scores = [];
+                    snapshot.forEach(child => {
+                        scores.push({ id: child.key, ...child.val() });
+                    });
+                    
+                    scores.sort((a, b) => b.score - a.score);
+                    
+                    if(scores.length > 13) {
+                        for(let i = 13; i < scores.length; i++) {
+                            await remove(ref(database, `scores/${scores[i].id}`));
+                        }
+                    }
+                }, { onlyOnce: true });
+            } catch(e) {
+                console.log('Error limpiando:', e);
+            }
+        }
+
+        function loadLeaderboard(containerId) {
+            if(!database) {
+                document.getElementById(containerId).innerHTML = `
+                    <h3>🏆 TOP 13 RANKING GLOBAL 🏆</h3>
+                    <p style="color: yellow;">⚠️ Firebase no configurado</p>
+                    <p style="font-size: 14px; color: white;">Para activar el ranking global, configura Firebase Realtime Database</p>
+                `;
+                return;
+            }
+
+            const scoresRef = ref(database, 'scores');
+            onValue(scoresRef, (snapshot) => {
+                const scores = [];
+                snapshot.forEach(child => {
+                    scores.push({ id: child.key, ...child.val() });
+                });
+                
+                scores.sort((a, b) => b.score - a.score);
+                const top13 = scores.slice(0, 13);
+                
+                let html = '<h3>🏆 TOP 13 RANKING GLOBAL 🏆</h3>';
+                
+                if(top13.length === 0) {
+                    html += '<p style="color: white;">¡Sé el primero en el ranking! 🚀</p>';
+                } else {
+                    top13.forEach((entry, index) => {
+                        const rank = index + 1;
+                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+                        const rankClass = `rank-${Math.min(rank, 3)}`;
+                        
+                        html += `
+                            <div class="leaderboard-entry ${rankClass}">
+                                <span class="rank">${medal}</span>
+                                <span class="player-name">${entry.name}</span>
+                                <span class="player-score">${entry.score} pts</span>
+                            </div>
+                        `;
+                    });
+                }
+                
+                document.getElementById(containerId).innerHTML = html;
+            });
+        }
+
+        window.showLeaderboardOnly = function() {
+            const startScreen = document.getElementById('startScreen');
+            if(startScreen.style.display === 'none') {
+                startScreen.style.display = 'block';
+                loadLeaderboard('startLeaderboard');
+            }
+        };
+
+        document.addEventListener('keydown', e => {
+            if(!gameActive) return;
+            const idx = keys.indexOf(e.key.toLowerCase());
+            if(idx !== -1) hitNote(idx);
+        });
+
+        buttons.forEach((btn, i) => btn.addEventListener('click', () => gameActive && hitNote(i)));
+
+        setInterval(() => gameActive && (posho.textContent = poshoEmojis[Math.floor(Math.random() * poshoEmojis.length)]), 2000);
+
+        loadLeaderboard('startLeaderboard');
+    </script>
+</body>
+</html>
