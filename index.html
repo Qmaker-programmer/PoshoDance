@@ -585,25 +585,41 @@
     </div>
 
 <script type="module">
-    // 1. Importar la función para la base de datos (getDatabase)
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, push, set, onValue, query, orderByChild, limitToLast, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-    // ... (Tu objeto firebaseConfig aquí)
+    // PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFrhAL6bIqSC7yL7mto-QrbHBjV0qE5Ew",
+      authDomain: "posho-dance-delux-version.firebaseapp.com",
+      projectId: "posho-dance-delux-version",
+      storageBucket: "posho-dance-delux-version.firebasestorage.app",
+      messagingSenderId: "133859843155",
+      appId: "1:133859843155:web:82db39ea3163d07e7d7aa6",
+      measurementId: "G-DKFTEV8RDP"
+    };
 
     let app, database;
     try {
-        // Inicializar la aplicación
         app = initializeApp(firebaseConfig);
-        // 2. Inicializar la base de datos
         database = getDatabase(app);
-        console.log("Firebase Database inicializado y listo para guardar récords.");
+        console.log("¡Conectado a la nube de Posho!");
+    } catch(e) {
+        console.log('Error:', e);
+    }
+
+let app, database;
+    try {
+        // Inicializar la aplicación con tu configuración
+        app = initializeApp(firebaseConfig);
+        database = getDatabase(app);
+        console.log("¡Conectado a la nube de Posho!");
     } catch(e) {
         console.log('Error al configurar Firebase, usando modo demo:', e);
     }
     
     // ✅ EL CÓDIGO DEL JUEGO CONTINÚA DIRECTAMENTE AQUÍ:
-        let score = 0, combo = 0, bestCombo = 0, misses = 0;
+    let score = 0, combo = 0, bestCombo = 0, misses = 0;
         let gameActive = false, notes = [], noteId = 0;
         let spawnInterval, gameSpeed = 3000, spawnRate = 1000;
         let perfectHits = 0, totalNotes = 0;
